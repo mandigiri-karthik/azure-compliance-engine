@@ -4,7 +4,7 @@ from services.blob_service import BlobService
 def test_upload_dummy_video():
     blob_service = BlobService()
 
-    stream_url = "https://samplelib.com/lib/preview/mp4/sample-5s.mp4"
+    stream_url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
     blob_name = "test/dummy-video.mp4"
 
     sas_url = blob_service.upload_from_stream(

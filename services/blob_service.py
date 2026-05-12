@@ -71,7 +71,7 @@ class BlobService:
         logger.info(f"SAS URL generates successfully for blob_name : {blob_name} (valid for {expiry_hours})")
         return sas_url
     
-    def delete_blob(self, blob_name:str) ->None :
+    def delete_blob(self, blob_name:str) -> None :
         """
         Deletes the blob after the indexing of the video is done
         Always call this after the video indexing is done so that we can save the cost
