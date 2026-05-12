@@ -4,11 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository state
 
-This repo is in **initial scaffolding**. Code does not yet exist — `requirements.txt` and `README.md` are empty, and `project.pdf` is the source-of-truth planning document. The current branch `feature/phase1-blob-upload` indicates Phase 1 work is starting (see Phased plan below).
+This repo is in **initial scaffolding**. The folder layout from `project.pdf` §3 is in place — `app/`, `pipeline/`, `pipeline/nodes/`, `services/`, `utils/`, `tests/` — but **every `.py` file is empty**. `README.md`, `Dockerfile`, `docker-compose.yml`, `main.py` are also empty. `project.pdf` is the source-of-truth planning document. The current branch `feature/phase1-blob-upload` indicates Phase 1 work is starting (see Phased plan below).
 
 When implementing, follow the folder layout in `project.pdf` §3 — do not invent a different structure.
 
-> Note: `.gitignore` currently contains literal heredoc syntax (`cat > .gitignore << EOF ... EOF`) instead of the intended rules. Fix this before relying on it — the file does not actually ignore `.env`, `__pycache__/`, `*.pem`, etc. as written.
+## Known repo issues (fix before relying on these)
+
+Three things are currently broken or unsafe. Treat as blockers — do not paper over them.
+
+1. **`.gitignore` is malformed.** Contents are the literal heredoc `cat > .gitignore << EOF ... EOF`, not ignore rules. As a result `.env`, `__pycache__/`, `*.pem`, `.venv/`, `local.settings.json`, `.DS_Store`, etc. are **not** being ignored. Rewrite the file to just the rules (drop the `cat > ... << EOF` wrapper and the trailing `EOF`).
+2. **`.env.example` contains live-looking Azure Storage credentials**, not placeholders (`AccountName=brandguardian12345` + a 64-char account key). It is tracked in git. Scrub to placeholders (`<your-account>` / `<your-key>`) and rotate the key in the Azure portal if it is real. Note: even a fixed `.gitignore` will not ignore `.env.example` — only `.env` / `*.env`, which is intentional but means the file ships as-is.
+3. **`requirements.txt` is the wrong dependency set.** It looks like a global `pip freeze` from a Jupyter/ML environment — contains `jupyter`, `torch`, `torchvision`, `keras`, `gymnasium`, `matplotlib`, `seaborn`, `ollama`, `scikit-learn`, etc., none of which the plan calls for. Meanwhile the actual stack is **missing**: `fastapi`, `uvicorn`, `langgraph`, `langchain`, `langchain-openai`, `langsmith`, `yt-dlp`, `azure-search-documents`, `azure-identity`, `azure-keyvault-secrets`, `openai`, `pydantic-settings`, `pytest`, `ruff`. Replace the file before `pip install -r requirements.txt` is meaningful.
 
 ## What this project is
 
@@ -56,11 +62,12 @@ The current branch (`feature/phase1-blob-upload`) is Phase 1 work. Default new b
 
 ## Commands (planned — not yet wired)
 
-These don't run yet because the code isn't written. As Phase 1 lands, the canonical commands will be:
+Nothing executable runs yet (all `.py` files are empty stubs). A `.venv/` exists at the repo root. **Do not `pip install -r requirements.txt` until that file is replaced** (see Known repo issues #3) — installing it as-is pulls ~140 unrelated packages and still won't satisfy the project's actual imports.
+
+Once `requirements.txt` is rewritten and Phase 1 lands, the canonical commands will be:
 
 ```bash
-# Setup (once the venv/requirements exist)
-python -m venv .venv && source .venv/bin/activate
+source .venv/bin/activate
 pip install -r requirements.txt
 
 # Phase 1+: CLI ingestion
